@@ -1,6 +1,6 @@
-import { KeycloakInstance } from 'keycloak-js'
+import Keycloak, { KeycloakInstance } from 'keycloak-js'
 import { toRefs, Ref } from 'vue-demi'
-import { getKeycloak } from './keycloak'
+import { getKeycloak, init } from './keycloak'
 import { KeycloakState, state } from './state'
 import { isNil } from './utils'
 
@@ -15,6 +15,7 @@ export interface KeycloakComposable {
   keycloak: KeycloakInstance
   hasRoles: (roles: string[]) => boolean
   hasResourceRoles: (roles: string[], resource: string) => boolean
+  init: (initOptions?: Keycloak.KeycloakInitOptions) => Promise<void>
 }
 
 export const useKeycloak = (): KeycloakComposable => {
@@ -28,5 +29,6 @@ export const useKeycloak = (): KeycloakComposable => {
       !isNil(resource) &&
       state.isAuthenticated &&
       roles.every(role => state.resourceRoles[resource].includes(role)),
+    init
   }
 }

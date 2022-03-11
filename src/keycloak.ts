@@ -5,6 +5,7 @@ import { isNil } from './utils'
 type KeycloakInstance = Keycloak.KeycloakInstance | undefined
 
 let $keycloak: KeycloakInstance = undefined
+let $initOptions: Keycloak.KeycloakInitOptions = undefined
 
 export async function isTokenReady(): Promise<void> {
   return new Promise(resolve => checkToken(resolve))
@@ -20,6 +21,10 @@ const checkToken = (resolve: () => void) => {
 
 export function getKeycloak(): Keycloak.KeycloakInstance {
   return $keycloak as Keycloak.KeycloakInstance
+}
+
+export function init(initOptions?: Keycloak.KeycloakInitOptions): Promise<void> {
+  return initKeycloak({ ...$initOptions, ...initOptions })
 }
 
 export async function getToken(): Promise<string> {
@@ -56,6 +61,10 @@ export async function updateToken(): Promise<string> {
 export function createKeycloak(config: Keycloak.KeycloakConfig | string): Keycloak.KeycloakInstance {
   $keycloak = Keycloak(config)
   return getKeycloak()
+}
+
+export function setKeycloakInitOptions(initOptions: Keycloak.KeycloakInitOptions): void {
+  $initOptions = initOptions
 }
 
 export async function initKeycloak(initConfig: Keycloak.KeycloakInitOptions): Promise<void> {

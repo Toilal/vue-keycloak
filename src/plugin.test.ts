@@ -1,7 +1,7 @@
 import { isVue2, isVue3, Vue2 } from 'vue-demi'
 import { KeycloakConfig } from 'keycloak-js'
 import { vueKeycloak } from './plugin'
-import { createKeycloak, initKeycloak } from './keycloak'
+import { createKeycloak, initKeycloak, setKeycloakInitOptions } from './keycloak'
 import { defaultInitConfig } from './const'
 
 const testVue3 = isVue3 ? test : test.skip
@@ -9,6 +9,7 @@ const testVue2 = isVue2 ? test : test.skip
 
 jest.mock('./keycloak', () => {
   return {
+    setKeycloakInitOptions: jest.fn(),
     initKeycloak: jest.fn(),
     createKeycloak: jest.fn(),
   }
@@ -99,5 +100,18 @@ describe('vueKeycloak', () => {
     })
 
     expect(initKeycloak as jest.Mock).toBeCalledWith({ ...defaultInitConfig, flow: 'my-flow' })
+  })
+
+  test('should not call init config when noInit is true', async () => {
+    await vueKeycloak.install(appMock, {
+      config: keycloakConfig,
+      initOptions: {
+        flow: 'my-flow',
+      },
+      noInit: true
+    })
+
+    expect(setKeycloakInitOptions as jest.Mock).toBeCalledWith({ ...defaultInitConfig, flow: 'my-flow' })
+    expect(initKeycloak as jest.Mock).not.toBeCalled()
   })
 })
